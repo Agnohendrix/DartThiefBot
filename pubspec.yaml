@@ -33,6 +33,9 @@ dependencies:
   win32: ^1.7.3
   desktop_window: ^0.3.0
 
+  #HTTP
+  http: ^0.12.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

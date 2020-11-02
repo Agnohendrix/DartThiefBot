@@ -1,9 +1,14 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'dart:ffi';
 import 'package:ffi/ffi.dart';
 import 'package:win32/win32.dart';
 import 'package:desktop_window/desktop_window.dart';
 import 'dart:async';
+
+//HTTP
+import 'package:http/http.dart' as http;
 
 bool testFlag(int value, int attribute) => value & attribute == attribute;
 //Gets power status object
@@ -78,7 +83,39 @@ String printReadableStatus(){
   }
 }
 
+//Sends a message from bot <token> to chat <myId>
+Future<http.Response> sendMessage(String token, String myId, String myMessage) async{
+  final http.Response response = await http.post(
+    'https://api.telegram.org/bot'+ token + '/sendMessage',
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+    },
+    body: jsonEncode(<String, String>{
+      'text': myMessage,
+      'chat_id' : myId
+    }),
+  );
+  if (response.statusCode == 201) {
+    // If the server did return a 201 CREATED response,
+    // then parse the JSON.
+    print("Funziona");
+  } else {
+    // If the server did not return a 201 CREATED response,
+    // then throw an exception.
+    throw Exception('Failed to load album');
+  }
+}
+
+
 void main() {
+  //Get your bot token: https://core.telegram.org/bots#6-botfather
+  var token = "<your_token>";
+
+  //Get your Telegram chat id: https://stackoverflow.com/a/54818656/4820276
+  var myId = "<your_chat_id>";
+
+  var url = 'https://api.telegram.org/bot'+ token;
+  sendMessage(token, myId, "Bot started");
   runApp(MyApp());
 }
 
