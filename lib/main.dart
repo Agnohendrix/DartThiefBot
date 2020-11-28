@@ -6,6 +6,7 @@ import 'package:ffi/ffi.dart';
 import 'package:win32/win32.dart';
 import 'package:desktop_window/desktop_window.dart';
 import 'dart:async';
+import 'dart:io';
 
 //HTTP
 import 'package:http/http.dart' as http;
@@ -113,6 +114,22 @@ void main() {
 
   //Get your Telegram chat id: https://stackoverflow.com/a/54818656/4820276
   var myId = "<your_chat_id>";
+  final file = new File('myBotInfos.txt');
+  Stream<List<int>> inputStream = file.openRead();
+
+  inputStream
+  .transform(utf8.decoder)       // Decode bytes to UTF-8.
+  .transform(new LineSplitter()) // Convert stream to individual lines.
+  .listen((String line) {        // Process results.
+    print('$line: ${line.length} bytes');
+  },
+    onDone: () {
+      print('File is now closed.'); },
+    onError: (e) {
+      print(e.toString());
+    }
+  );
+
 
   var url = 'https://api.telegram.org/bot'+ token;
   sendMessage(token, myId, "Bot started");
