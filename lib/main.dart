@@ -110,29 +110,40 @@ Future<http.Response> sendMessage(String token, String myId, String myMessage) a
 
 void main() {
   //Get your bot token: https://core.telegram.org/bots#6-botfather
-  var token = "<your_token>";
+  var token = "my_token";
 
   //Get your Telegram chat id: https://stackoverflow.com/a/54818656/4820276
-  var myId = "<your_chat_id>";
+  var myId = "my_chat_id";
+
+  String fileInput;
   final file = new File('myBotInfos.txt');
   Stream<List<int>> inputStream = file.openRead();
-
+  print("BeforeToken: " + token + " ChatId: " + myId);
   inputStream
   .transform(utf8.decoder)       // Decode bytes to UTF-8.
   .transform(new LineSplitter()) // Convert stream to individual lines.
   .listen((String line) {        // Process results.
-    print('$line: ${line.length} bytes');
+    if(line.contains("bot_token:")){
+      int idx = line.indexOf("bot_token:");
+      token = line.substring(idx+10).trim();
+      print("Token:" + token);
+    } else if(line.contains("chat_id:")){
+      int idx = line.indexOf("chat_id:");
+      myId = line.substring(idx+8).trim();
+      print("Chat Id:" + myId);
+    }
   },
     onDone: () {
-      print('File is now closed.'); },
+      print('File is now closed.');
+      sendMessage(token, myId, "Bot started");
+      },
     onError: (e) {
       print(e.toString());
     }
   );
-
-
+  print("AfterToken: " + token + " ChatId: " + myId);
   var url = 'https://api.telegram.org/bot'+ token;
-  sendMessage(token, myId, "Bot started");
+
   runApp(MyApp());
 }
 
