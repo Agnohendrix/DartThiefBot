@@ -76,8 +76,18 @@ String printReadableStatus(){
   SYSTEM_POWER_STATUS powerStatus;
   powerStatus = getPowerStatus();
   if (powerStatus.ACLineStatus == 0) {
+    if(ACStatus.status != ' - Disconnected from AC power.'){
+      ACStatus.status = ' - Disconnected from AC power.';
+      //Send message
+      sendMessage(myInfos.token, myInfos.chat_id, "Your PC is now disconnected from AC power :(");
+    }
+
     return ' - Disconnected from AC power.';
   } else if (powerStatus.ACLineStatus == 1) {
+    if(ACStatus.status != ' - Connected to AC power.'){
+      ACStatus.status = ' - Connected to AC power.';
+      sendMessage(myInfos.token, myInfos.chat_id, "Your PC is now connected to AC power :)");
+    }
     return ' - Connected to AC power.';
   } else {
     return ' - AC power status unknown.';
@@ -107,8 +117,20 @@ Future<http.Response> sendMessage(String token, String myId, String myMessage) a
   }
 }
 
+//Stores token and id read from file
+class myInfos {
+  static var token;
+  static var chat_id;
+}
+
+//Stores ACLine actual status
+class ACStatus {
+  static var status;
+}
 
 void main() {
+  ACStatus.status = printReadableStatus();
+
   //Get your bot token: https://core.telegram.org/bots#6-botfather
   var token = "my_token";
 
@@ -135,7 +157,9 @@ void main() {
   },
     onDone: () {
       print('File is now closed.');
-      sendMessage(token, myId, "Bot started");
+      myInfos.token = token;
+      myInfos.chat_id = myId;
+      sendMessage(token, myId, "Bot started" + ACStatus.status);
       },
     onError: (e) {
       print(e.toString());
@@ -148,7 +172,6 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -215,6 +238,7 @@ class _MyHomePageState extends State<MyHomePage> {
       // _counter without calling setState(), then the build method would not be
       // called again, and so nothing would appear to happen.
       _status = printReadableStatus();
+
     });
   }
 
